@@ -14,11 +14,10 @@ const {
 } = process.env;
 
 const urlsToScrape = [
-    'https://en.wikipedia.org/wiki/Formula_One'
-    /*'https://en.wikipedia.org/wiki/List_of_medical_symptoms',
+    'https://en.wikipedia.org/wiki/List_of_medical_symptoms',
     'https://uhs.princeton.edu/health-resources/common-illnesses',
     'https://my.clevelandclinic.org/health/diseases/16397-avoiding-healthcare-associated-infections-hais',
-    'https://www.uwmedicine.org/conditions-symptoms'*/
+    'https://www.uwmedicine.org/conditions-symptoms'
 ];
 
 const client = new DataAPIClient(ASTRA_DB_APPLICATION_TOKEN);

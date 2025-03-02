@@ -1,6 +1,10 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect, useRef } from "react";
-
+import { marked } from 'marked';
+marked.setOptions({
+  breaks: true,
+  gfm: true
+});
 const ChatUI = () => {
   // State for storing messages
   const [messages, setMessages] = useState([]);
@@ -36,11 +40,9 @@ const ChatUI = () => {
       const response = await fetch("/v1/chat/completions", {
         method: "POST",
         mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "llama2", // This might vary based on your LM Studio setup
+          model: "TheBloke/Llama-2-7B-Chat-GGUF",  // Use the fine-tuned model
           messages: [
             ...messages.map(msg => ({
               role: msg.sender === "user" ? "user" : "assistant",
@@ -52,6 +54,7 @@ const ChatUI = () => {
           max_tokens: 500
         }),
       });
+
 
       const data = await response.json();
 
@@ -157,12 +160,17 @@ const ChatUI = () => {
                     }`}
                 >
                   <div
-                    className={`inline-block p-2 rounded-lg ${message.sender === "user"
-                      ? "bg-green-500 text-white"
-                      : "bg-gray-800 text-white"
+                    className={`inline-block p-2 rounded-lg ${message.sender === "user" ? "bg-green-500 text-white" : "bg-gray-800 text-white"
                       }`}
                   >
-                    {message.text}
+                    {message.sender === "bot" ? (
+                      <div
+                        className="text-left markdown-content"
+                        dangerouslySetInnerHTML={{ __html: marked(message.text) }}
+                      />
+                    ) : (
+                      message.text
+                    )}
                   </div>
                 </div>
               ))}

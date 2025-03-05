@@ -1,6 +1,5 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
 
 const ChatUI = () => {
   // State for storing messages
@@ -36,12 +35,11 @@ const ChatUI = () => {
       // LM Studio typically follows the OpenAI API format
       const response = await fetch("/v1/chat/completions", {
         method: "POST",
-        mode: "cors",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama2", // This might vary based on your LM Studio setup
+          model: "TheBloke/Llama-2-7B-Chat-GGUF", // Use the fine-tuned model
           messages: [
             ...messages.map((msg) => ({
               role: msg.sender === "user" ? "user" : "assistant",
@@ -183,7 +181,16 @@ const ChatUI = () => {
                         : "bg-gray-800 text-white"
                     }`}
                   >
-                    {message.text}
+                    {message.sender === "bot" ? (
+                      <div
+                        className="text-left markdown-content"
+                        dangerouslySetInnerHTML={{
+                          __html: marked(message.text),
+                        }}
+                      />
+                    ) : (
+                      message.text
+                    )}
                   </div>
                 </div>
               ))}

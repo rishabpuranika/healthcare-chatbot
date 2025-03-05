@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
 const ChatUI = () => {
   // State for storing messages
@@ -24,49 +25,53 @@ const ChatUI = () => {
   // Function to handle sending messages
   const handleSendMessage = async () => {
     if (input.trim() === "") return;
-    
+
     // Add user message to chat
     const userMessage = { sender: "user", text: input };
     setMessages([...messages, userMessage]);
     setInput("");
     setIsLoading(true);
-    
+
     try {
       // LM Studio typically follows the OpenAI API format
       const response = await fetch("/v1/chat/completions", {
         method: "POST",
+        mode: "cors",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           model: "llama2", // This might vary based on your LM Studio setup
           messages: [
-            ...messages.map(msg => ({
+            ...messages.map((msg) => ({
               role: msg.sender === "user" ? "user" : "assistant",
-              content: msg.text
+              content: msg.text,
             })),
-            { role: "user", content: input }
+            { role: "user", content: input },
           ],
           temperature: 0.7,
-          max_tokens: 500
+          max_tokens: 500,
         }),
       });
-      
+
       const data = await response.json();
-      
+
       // Extract the assistant's response
       const assistantResponse = data.choices[0].message.content;
-      
+
       // Add assistant message to chat
-      setMessages(prev => [...prev, { sender: "bot", text: assistantResponse }]);
+      setMessages((prev) => [
+        ...prev,
+        { sender: "bot", text: assistantResponse },
+      ]);
     } catch (error) {
       console.error("Error connecting to LM Studio:", error);
-      setMessages(prev => [
-        ...prev, 
-        { 
-          sender: "bot", 
-          text: "Sorry, I couldn't connect to the AI model. Please make sure LM Studio is running locally."
-        }
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "bot",
+          text: "Sorry, I couldn't connect to the AI model. Please make sure LM Studio is running locally.",
+        },
       ]);
     } finally {
       setIsLoading(false);
@@ -103,10 +108,18 @@ const ChatUI = () => {
           <div className="mt-4">
             <h3 className="text-green-200 text-sm mb-2">Categories</h3>
             <ul className="text-white space-y-2">
-              <li className="cursor-pointer">🩺 General Health</li>
-              <li className="cursor-pointer">💊 Medications</li>
-              <li className="cursor-pointer">🍎 Nutrition</li>
-              <li className="cursor-pointer">🧘 Mental Wellness</li>
+              <li className="cursor-pointer">
+                <Link to="/general-health">🩺 General Health</Link>
+              </li>
+              <li className="cursor-pointer">
+                <Link to="/medications">💊 Medications</Link>
+              </li>
+              <li className="cursor-pointer">
+                <Link to="/nutrition">🍎 Nutrition</Link>
+              </li>
+              <li className="cursor-pointer">
+                <Link to="/mental-wellness">🧘 Mental Wellness</Link>
+              </li>
             </ul>
           </div>
           <button className="mt-auto bg-green-500 text-white p-2 rounded-lg font-semibold">
@@ -123,24 +136,31 @@ const ChatUI = () => {
                   How can I assist with your health today?
                 </h1>
                 <p className="text-gray-400 text-sm mt-2">
-                  This healthcare chatbot provides guidance on medical queries...
+                  This healthcare chatbot provides guidance on medical
+                  queries...
                 </p>
                 <div className="mt-4 flex justify-center space-x-4">
-                  <button 
+                  <button
                     className="bg-green-500 px-4 py-2 rounded-lg"
-                    onClick={() => handlePresetMessage("What are common cold symptoms?")}
+                    onClick={() =>
+                      handlePresetMessage("What are common cold symptoms?")
+                    }
                   >
                     Symptom Checker
                   </button>
-                  <button 
+                  <button
                     className="bg-green-500 px-4 py-2 rounded-lg"
-                    onClick={() => handlePresetMessage("How do antibiotics work?")}
+                    onClick={() =>
+                      handlePresetMessage("How do antibiotics work?")
+                    }
                   >
                     Medication Info
                   </button>
-                  <button 
+                  <button
                     className="bg-green-500 px-4 py-2 rounded-lg"
-                    onClick={() => handlePresetMessage("Tips for better sleep?")}
+                    onClick={() =>
+                      handlePresetMessage("Tips for better sleep?")
+                    }
                   >
                     Lifestyle Tips
                   </button>
@@ -191,7 +211,7 @@ const ChatUI = () => {
                 placeholder="Ask a health-related question..."
                 className="flex-1 bg-transparent text-white p-2 outline-none"
               />
-              <button 
+              <button
                 className="bg-green-500 text-white p-2 rounded-lg"
                 onClick={handleSendMessage}
                 disabled={isLoading}

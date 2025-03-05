@@ -2,7 +2,7 @@
   "name": "healthcare-bot",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:1234",
+  "proxy": "http://127.0.0.1:1234",
   "dependencies": {
     "@datastax/astra-db-ts": "^1.5.0",
     "@langchain/community": "^0.3.32",

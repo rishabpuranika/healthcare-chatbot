@@ -1,5 +1,7 @@
+/* eslint-disable no-undef */
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
 const ChatUI = () => {
   // State for storing messages

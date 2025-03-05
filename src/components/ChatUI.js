@@ -2,6 +2,7 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import { marked } from 'marked';
 
 const ChatUI = () => {
   // State for storing messages
@@ -172,16 +173,14 @@ const ChatUI = () => {
               {messages.map((message, index) => (
                 <div
                   key={index}
-                  className={`mb-4 ${
-                    message.sender === "user" ? "text-right" : "text-left"
-                  }`}
+                  className={`mb-4 ${message.sender === "user" ? "text-right" : "text-left"
+                    }`}
                 >
                   <div
-                    className={`inline-block p-2 rounded-lg ${
-                      message.sender === "user"
+                    className={`inline-block p-2 rounded-lg ${message.sender === "user"
                         ? "bg-green-500 text-white"
                         : "bg-gray-800 text-white"
-                    }`}
+                      }`}
                   >
                     {message.sender === "bot" ? (
                       <div

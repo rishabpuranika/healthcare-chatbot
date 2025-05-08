@@ -1,5 +1,7 @@
 import { DataAPIClient } from "@datastax/astra-db-ts"
 import axios from "axios"
+import dotenv from "dotenv"
+dotenv.config()
 
 const {
     ASTRA_DB_NAMESPACE,

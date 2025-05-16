@@ -37,6 +37,25 @@ export async function POST(req: Request) {
         const { messages } = await req.json()
         const latestMessage = messages[messages?.length - 1]?.content
 
+        const isMedicalQuery = (message: string): boolean => {
+            const medicalKeywords = [
+                "symptom", "disease", "illness", "condition", "treatment",
+                "diagnosis", "medicine", "health", "doctor", "patient"
+            ];
+            return medicalKeywords.some(keyword => message.toLowerCase().includes(keyword));
+        };
+
+        if (!isMedicalQuery(latestMessage)) {
+            return new Response(JSON.stringify({
+                error: "The query is not related to the medical field. Please ask a medical-related question."
+            }), {
+                status: 400,
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+        }
+
         let docContext = ""
 
         try {
@@ -83,6 +102,8 @@ export async function POST(req: Request) {
             • Symptom 3
             
             If the context doesn't include the information you need, respond based on your existing knowledge and don't mention the source of information.
+
+            If the context is not relevant to medical field, respond with "I cant answer that question as it is not related to medical field".
             ------------------
             START CONTEXT
             ${docContext}

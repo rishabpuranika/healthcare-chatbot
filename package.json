@@ -21,6 +21,7 @@
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.2.0",
     "react-scripts": "5.0.1",
+    "selenium-webdriver": "^4.18.1",
     "ts-node": "^10.9.2",
     "web-vitals": "^2.1.4"
   },
@@ -29,7 +30,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "seed": "ts-node ./scripts/loadDb.ts",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "automate": "ts-node ./scripts/automate.ts"
   },
   "eslintConfig": {
     "extends": [

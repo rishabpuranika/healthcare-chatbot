@@ -38,16 +38,52 @@ export async function POST(req: Request) {
         const latestMessage = messages[messages?.length - 1]?.content
 
         const isMedicalQuery = (message: string): boolean => {
+            // First check if the message is too short or contains only special characters/numbers
+            if (!message || message.length < 3 || /^[^a-zA-Z]*$/.test(message)) {
+                return false;
+            }
+
             const medicalKeywords = [
-                "symptom", "disease", "illness", "condition", "treatment",
-                "diagnosis", "medicine", "health", "doctor", "patient"
+                // General health terms
+                "health", "medical", "doctor", "patient", "hospital", "clinic",
+                // Symptoms and conditions
+                "symptom", "disease", "illness", "condition", "disorder", "syndrome",
+                // Treatment related
+                "treatment", "medicine", "medication", "drug", "therapy", "cure",
+                // Body parts and systems
+                "heart", "lung", "brain", "blood", "bone", "muscle", "skin",
+                // Common medical procedures
+                "surgery", "operation", "diagnosis", "test", "scan", "x-ray",
+                // Mental health
+                "mental", "psychology", "depression", "anxiety", "stress",
+                // Lifestyle and prevention
+                "diet", "exercise", "nutrition", "vitamin", "sleep", "fitness",
+                // Emergency and first aid
+                "emergency", "first aid", "injury", "wound", "pain"
             ];
-            return medicalKeywords.some(keyword => message.toLowerCase().includes(keyword));
+
+            const messageLower = message.toLowerCase().trim();
+
+            // Check if the message contains any medical keywords
+            const hasMedicalKeyword = medicalKeywords.some(keyword => messageLower.includes(keyword));
+
+            // Additional check for common non-medical patterns
+            const nonMedicalPatterns = [
+                /^[0-9]+$/,  // Only numbers
+                /^[^a-zA-Z0-9]+$/,  // Only special characters
+                /^[a-z]{1,2}$/,  // Very short words
+                /^[a-z]+[0-9]+$/,  // Words followed by numbers only
+                /^[0-9]+[a-z]+$/   // Numbers followed by words only
+            ];
+
+            const hasNonMedicalPattern = nonMedicalPatterns.some(pattern => pattern.test(messageLower));
+
+            return hasMedicalKeyword && !hasNonMedicalPattern;
         };
 
         if (!isMedicalQuery(latestMessage)) {
             return new Response(JSON.stringify({
-                error: "The query is not related to the medical field. Please ask a medical-related question."
+                error: "I can only answer questions related to healthcare and medical topics. Please ask a health-related question."
             }), {
                 status: 400,
                 headers: {
@@ -87,7 +123,15 @@ export async function POST(req: Request) {
 
         const template = {
             role: "system",
-            content: `You are an AI assistant who knows everything about medical diseases and their symptoms.
+            content: `You are an AI healthcare assistant specialized in medical information and health advice.
+            Your primary role is to provide accurate and helpful information about health-related topics.
+            
+            IMPORTANT RULES:
+            1. ONLY respond to questions related to healthcare, medical conditions, treatments, or health advice
+            2. If a question is not related to healthcare, respond with: "I can only answer questions related to healthcare and medical topics. Please ask a health-related question."
+            3. Always maintain a professional and medical tone
+            4. When providing medical information, include appropriate disclaimers about consulting healthcare professionals
+            
             Use the below context to augment what you know about medical diseases.
             
             IMPORTANT: Format your responses using proper markdown:
@@ -103,7 +147,7 @@ export async function POST(req: Request) {
             
             If the context doesn't include the information you need, respond based on your existing knowledge and don't mention the source of information.
 
-            If the context is not relevant to medical field, respond with "I cant answer that question as it is not related to medical field".
+            If the context is not relevant to medical field, respond with "I can only answer questions related to healthcare and medical topics. Please ask a health-related question."
             ------------------
             START CONTEXT
             ${docContext}
